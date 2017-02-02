@@ -11,14 +11,13 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 
-import unity.fourcircle.UserAuthKI.MyUserInfo;
-
 public class SSHThread extends Thread {
 
     private String host;
     private String userName;
     private String password;
     private List<SSHData> dataList;
+    private boolean isReady = false;
 
     public SSHThread(String host, String userName, String password) {
         this.host = host;
@@ -29,6 +28,10 @@ public class SSHThread extends Thread {
 
     public List<SSHData> getSSHData() {
         return dataList;
+    }
+
+    public boolean isReady() {
+        return isReady;
     }
 
     private void addSSHData(SSHData data) {
@@ -45,7 +48,7 @@ public class SSHThread extends Thread {
 
             Session session = jsch.getSession(userName, host, 22);
 
-            UserInfo ui = new MyUserInfo();
+            UserInfo ui = new SSHUserInfo();
             session.setPassword(password);
             session.setUserInfo(ui);
 
@@ -72,6 +75,7 @@ public class SSHThread extends Thread {
             System.out.println("Reading script output...");
             String line = "";
 
+            isReady = true;
             while (line != null) {
                 line = fromServer.readLine();
                 System.out.println(line);
@@ -99,6 +103,7 @@ public class SSHThread extends Thread {
 
             }
 
+            isReady = false;
             channel.disconnect();
             session.disconnect();
 

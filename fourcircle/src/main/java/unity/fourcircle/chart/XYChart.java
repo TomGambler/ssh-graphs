@@ -1,6 +1,6 @@
-package unity.fourcircle;
+package unity.fourcircle.chart;
 
-import java.util.Random;
+import java.util.List;
 
 /* ===========================================================
  * JFreeChart : a free chart library for the Java(tm) platform
@@ -50,36 +50,37 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
-import org.jfree.ui.RefineryUtilities;
+
+import unity.fourcircle.ssh.SSHData;
 
 /**
  * A simple demo showing a dataset created using the {@link XYSeriesCollection} class.
  *
  */
-public class XYSeriesDemo extends ApplicationFrame {
+public class XYChart extends ApplicationFrame {
 
     /**
      * A demonstration application showing an XY series containing a null value.
      *
      * @param title the frame title.
      */
-    public XYSeriesDemo(final String title) {
+    public XYChart(String title) {
 
         super(title);
 
     }
 
-    private static ChartPanel generateChart() {
-        Random rand = new Random();
-        final XYSeries series = new XYSeries("Random Data");
-        for (int i = 1; i <= 30; i++) {
-            series.add(i, rand.nextInt(1000));
+    public static ChartPanel generateChart(List<SSHData> dataList) {
+        final XYSeries series = new XYSeries("License information");
+        int i = 1;
+        for (SSHData data : dataList) {
+            series.add(i++, data.getLicenseNumber());
         }
         final XYSeriesCollection data = new XYSeriesCollection(series);
         final JFreeChart chart = ChartFactory.createXYLineChart(
                 "XY Series Demo",
-                "X",
-                "Y",
+                "Info Packet Number",
+                "Number of licenses used",
                 data,
                 PlotOrientation.VERTICAL,
                 true,
@@ -89,40 +90,6 @@ public class XYSeriesDemo extends ApplicationFrame {
         final ChartPanel chartPanel = new ChartPanel(chart);
         chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
         return chartPanel;
-    }
-
-
-    // ****************************************************************************
-    // * JFREECHART DEVELOPER GUIDE *
-    // * The JFreeChart Developer Guide, written by David Gilbert, is available *
-    // * to purchase from Object Refinery Limited: *
-    // * *
-    // * http://www.object-refinery.com/jfreechart/guide.html *
-    // * *
-    // * Sales are used to provide funding for the JFreeChart project - please *
-    // * support us so that we can continue developing free software. *
-    // ****************************************************************************
-
-    /**
-     * Starting point for the demonstration application.
-     *
-     * @param args ignored.
-     */
-    public static void main(final String[] args) {
-
-        XYSeriesDemo demo = new XYSeriesDemo("XY Series Demo");
-        demo.setContentPane(generateChart());
-        demo.pack();
-        RefineryUtilities.centerFrameOnScreen(demo);
-        demo.setVisible(true);
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        demo.setContentPane(generateChart());
-        demo.pack();
-
     }
 
 }

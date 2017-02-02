@@ -3,9 +3,14 @@ package unity.fourcircle.main;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 
+import org.jfree.ui.RefineryUtilities;
+
 import unity.fourcircle.base64.Base64;
+import unity.fourcircle.chart.XYChart;
+import unity.fourcircle.ssh.SSHData;
 import unity.fourcircle.ssh.SSHThread;
 
 public class Main {
@@ -43,6 +48,32 @@ public class Main {
 
         SSHThread sshThread = new SSHThread(host, userName, password);
         sshThread.run();
+
+        while (!sshThread.isReady()) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        XYChart chart = new XYChart("XY Series Demo");
+        SSHData lastData = null;
+        while (true) {
+            List<SSHData> currentDataList = sshThread.getSSHData();
+            if (!lastData.equals(currentDataList.get(currentDataList.size() - 1))) {
+                chart.setContentPane(XYChart.generateChart(sshThread.getSSHData()));
+                chart.pack();
+                RefineryUtilities.centerFrameOnScreen(chart);
+                chart.setVisible(true);
+            }
+            lastData = currentDataList.get(currentDataList.size() - 1);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
